@@ -1,0 +1,107 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chime Control</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        #time {
+            font-size: 48px;
+            font-weight: bold;
+        }
+        #chimeConfig {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Display the current time -->
+    <div id="time"></div>
+
+    <!-- Chime configuration -->
+    <div id="chimeConfig">
+        <label for="chimeInterval">Chime Interval:</label>
+        <select id="chimeInterval">
+            <option value="30">Every 30 Minutes</option>
+            <option value="60">Every Hour</option>
+        </select>
+        <br>
+        <input type="checkbox" id="allowChime">
+        <label for="allowChime">Allow Chime</label>
+        <br>
+        <button onclick="toggleChime()">Toggle Chime</button>
+    </div>
+
+    <!-- Audio element for the chime sound -->
+    <audio id="chimeSound" src="casio_sound.mp3" preload="auto"></audio>
+
+    <script>
+        // Function to update the displayed time
+        function updateTime() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('time').textContent = `${hours}:${minutes}:${seconds}`;
+        }
+
+        // Function to play the chime sound
+        function playChime() {
+            const chimeSound = document.getElementById('chimeSound');
+            chimeSound.play();
+        }
+
+        // Function to check whether to chime based on the current time
+        function checkChime() {
+            const now = new Date();
+            const minutes = now.getMinutes();
+            const seconds = now.getSeconds();
+            const interval = parseInt(document.getElementById('chimeInterval').value, 10);
+            const allowChime = document.getElementById('allowChime').checked;
+
+            // Only chime if the checkbox is checked
+            if (allowChime) {
+                // Chime every full hour (minutes == 0) or every half-hour (minutes == 30)
+                //if ((minutes === 0 || (interval === 30 && minutes === 30)) && seconds === 0) {
+                console.log("minutes: ",minutes,"seconds: ",seconds);
+                if ((minutes === 0 || (interval === 30 && minutes === 30))) {
+                    //if (minutes%5 === 0 && seconds === 0) {
+                    playChime();
+                    console.log("Sound played!");
+                }
+            }
+        }
+
+        // Function to continuously check time with better accuracy
+        function startChimeChecker() {
+            //let nextCheck = 1000 - (new Date().getMilliseconds()); // Start with the nearest second
+
+            function check() {
+                updateTime();
+                checkChime();
+                let nextCheck = 60000 - (new Date().getSeconds() * 1000 + new Date().getMilliseconds());
+                setTimeout(check, nextCheck);
+            }
+
+            check();
+        }
+
+        // Initialize time display and chime checking
+        startChimeChecker();
+
+        // Function to toggle the checkbox state
+        function toggleChime() {
+            const checkbox = document.getElementById('allowChime');
+            checkbox.checked = !checkbox.checked;
+        }
+    </script>
+
+</body>
+</html>
